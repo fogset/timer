@@ -11,10 +11,14 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MainActivity extends AppCompatActivity {
         MediaPlayer mediaPlayer;
         TextView timer;
         SeekBar bar;
+        int value;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,13 +26,17 @@ public class MainActivity extends AppCompatActivity {
         final MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.laser);
         bar = (SeekBar)findViewById(R.id.seekBar);
         timer = (TextView)findViewById(R.id.textView);
-        
+
+        bar.setMax(600);
 
         bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                timer.setText(String.valueOf(progress));
-                timer(progress);
+                int minutes = progress /60;
+                int seconds = progress- (minutes* 60);
+                timer.setText(String.valueOf(minutes) + ":" + Integer.toString(seconds));
+                value = progress;
+
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -41,13 +49,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
     }
     private void timer(int maxTime){
-        new CountDownTimer(maxTime*100, 1000){
+        new CountDownTimer(maxTime*1000, 1000){
             public void onTick(long millisecondsUntilDone){
+                long y = millisecondsUntilDone/1000;
                 Log.i("Second Left!",String.valueOf(millisecondsUntilDone/1000 ));
-                timer.setText(String.valueOf(millisecondsUntilDone/1000 ));
+                //timer.setText(String.valueOf(millisecondsUntilDone/1000 ));
+
+                bar.setProgress((int)y);
             }
             public void onFinish(){
                 Log.i("We are done!", "No more countdown");
@@ -56,9 +66,7 @@ public class MainActivity extends AppCompatActivity {
         }.start();
     }
     public void onStart(View view){
-        timer(100);
-
-
+        timer(value);
     }
 }
 
